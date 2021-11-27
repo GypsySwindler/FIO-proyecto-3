@@ -1,0 +1,70 @@
+#Este debe generar Regiones, centros/servicios,
+#coeficientes de la funcion objetivo (utilidad) y la densidad de los grafos
+#(i.e. % de que una region sea adyacente con otra)
+
+
+import random
+#import xlsxwriter
+#from docplex.mp.model import Model
+
+class ParametrosInstancia:
+    def __init__(self, Regiones, Centros, minUtil, maxUtil, probZero):
+        self.Regiones = Regiones #numero de regiones
+        self.Centros = Centros #numero de centros a instalar
+        self.minUtil = minUtil #minima utilidad recibida por centro instalado
+        self.maxUtil = maxUtil #maxima utilidad recibida por centro instalado
+        self.probZero = probZero #probabilidad de que una region sea adyacente a un centro
+
+class Instancia:
+    def __init__(self, Regiones, Centros, utilidad, Tabla):
+        self.Regiones = Regiones
+        self.Centros = Centros
+        self.utilidad = utilidad
+        self.Tabla = Tabla
+
+def CrearInstancia(p):
+    restriccion = []
+    for i in range(p.Regiones):
+        restriccion.append(1)
+    
+    utilidad = []
+    for i in range(p.Centros):
+        utilidad.append(random.randint(p.minUtil, p.maxUtil))
+    
+    Tabla = []                  #Metodo 1 de adyacencias: distribución uniforme a través de una probabilidad.
+    for i in range(p.Regiones):
+        Tabla.append([])
+        for j in range(p.Centros):
+            if random.randint(1,100)<=p.probZero:
+                Tabla[i].append(0)
+            else:
+                Tabla[i].append(1)
+    Tabla2 = []                  #Metodo 2 de adyacencias: distribuciónes relativamente distintas
+    for j in range(p.Centros):
+        probZero2=p.probZero(random.randint(1,100))
+        Tabla2.append([])
+        for i in range(p.Regiones):
+            if random.randint(1,100)<=probZero2:
+                Tabla2[i].append(0)
+            else:
+                Tabla2[i].append(1)
+    
+##    for j in range(p.Regiones):
+##        puroszeros = 1
+##        for i in range(p.Centros):
+##            if Tabla[i][j]!=0:
+##                puroszeros = 0
+##                break
+##        if puroszeros:
+##            Tabla[random.randint(0,Centros)][j] = 1
+
+    return Instancia(p.Regiones,p.Centros,utilidad,Tabla)  #notar que Utilidad es una lista con los coef de la FO y que Tabla es de
+                                                           #tamaño #regiones x #centros, que posee solo 1s y 0s
+
+parametrosBase = ParametrosInstancia(20,6,1,100,50)
+
+print(CrearInstancia(parametrosBase).Regiones)
+print(CrearInstancia(parametrosBase).Centros)
+print(CrearInstancia(parametrosBase).utilidad)
+print(CrearInstancia(parametrosBase).Tabla)
+    
